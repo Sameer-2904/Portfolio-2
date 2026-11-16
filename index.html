@@ -4,11 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fluid Cursor</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 <style>
-:root{--bg:#fff;--text:#111;--sub:#666;--card:rgba(255,255,255,.93);--line:#e6e6e6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#fff;--text:#111;--sub:#666;--card:rgba(255,255,255,.93);--line:#e6e6e6;--chip:#fff;--glass:rgba(255,255,255,.22);--glass-on:rgba(255,255,255,.4);--glass-line:rgba(0,0,0,.08);--sh1:rgba(0,0,0,.04);--sh2:rgba(0,0,0,.08);--sh3:rgba(0,0,0,.08);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme=dark]{--bg:#000;--text:#f2f2f2;--sub:#9a9a9a;--card:rgba(14,14,18,.88);--line:#2a2a30;--chip:#0b0b0e;--glass:rgba(255,255,255,.08);--glass-on:rgba(255,255,255,.16);--glass-line:rgba(255,255,255,.14);--sh1:rgba(0,0,0,.4);--sh2:rgba(0,0,0,.5);--sh3:rgba(0,0,0,.6);color-scheme:dark}
 html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;touch-action:none}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
-.hero{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;color:var(--text)}
+.hero{transition:opacity 1s ease .2s;position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;color:var(--text)}
 .hero p{margin:0;color:var(--sub);font-size:clamp(1rem,2.4vw,1.25rem)}
 .hero h1{margin:.15em 0;font-size:clamp(2.4rem,8vw,5rem);letter-spacing:-.03em}
 .avatar{width:clamp(110px,min(22vw,24vh),190px);margin-top:14px;animation:bob 4.5s ease-in-out infinite;filter:drop-shadow(0 12px 24px rgba(120,100,200,.18))}
@@ -18,36 +20,64 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 .orbit{transform-origin:100px 100px;animation:spin 16s linear infinite}
 .shield{transform-origin:100px 100px;animation:glow 3.5s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+body:not(.ready) .hero,body:not(.ready) .nav{opacity:0;pointer-events:none}
+#greet{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:4;pointer-events:none;color:var(--text);font-weight:600;letter-spacing:-.02em;font-size:clamp(2.8rem,11vw,6.5rem);text-align:center;transition:opacity .7s ease}
+#greet.out{opacity:0}
+#greet.in{animation:gin .3s ease-out}
+@keyframes gin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#theme{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;z-index:5;width:88px;height:42px;padding:0;border:0;border-radius:99px;cursor:pointer;background:#ececec;box-shadow:inset 0 3px 6px rgba(0,0,0,.28),inset 0 -1px 2px rgba(255,255,255,.9),0 1px 0 rgba(255,255,255,.9);transition:background .35s,box-shadow .35s}
+:root[data-theme=dark] #theme{background:#1c1e21;box-shadow:inset 0 3px 7px rgba(0,0,0,.8),inset 0 -1px 1px rgba(255,255,255,.07),0 0 0 1px rgba(255,255,255,.12)}
+#theme .knob{position:absolute;top:4px;left:4px;width:34px;height:34px;border-radius:50%;background:linear-gradient(145deg,#fbfbfb,#d9d9d9);box-shadow:0 3px 7px rgba(0,0,0,.35),inset 0 1px 1px #fff;transform:translateX(46px);transition:transform .35s cubic-bezier(.5,0,.2,1)}
+:root[data-theme=dark] #theme .knob{transform:none;background:linear-gradient(145deg,#f1f1f1,#c4c4c4)}
+#theme .ti{position:absolute;top:10px;width:22px;height:22px;transition:opacity .3s}
+#theme .sun{left:14px;opacity:1}
+#theme .moon{right:14px;opacity:0}
+:root[data-theme=dark] #theme .sun{opacity:0}
+:root[data-theme=dark] #theme .moon{opacity:1}
+#theme:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+.ic{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.2em;flex:none}
+.panel p .ic{margin-right:.35em}
 @media (prefers-reduced-motion: reduce){.avatar,.orbit,.shield{animation:none}}
-.nav{position:fixed;left:0;right:0;bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:0 16px;z-index:3}
-.nav button{pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:78px;padding:12px 14px;background:rgba(255,255,255,.22);backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%);border:1px solid rgba(0,0,0,.08);border-radius:14px;color:var(--text);font-weight:500;font-size:.85rem;font-family:inherit;box-shadow:0 2px 10px rgba(0,0,0,.04);transition:transform .2s,box-shadow .2s}
-.nav button span{font-size:1.2rem}
-.nav button:hover,.nav button.on{transform:translateY(-3px);background:rgba(255,255,255,.4);box-shadow:0 8px 20px rgba(0,0,0,.08)}
-.panel{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);width:min(660px,calc(100% - 32px));max-height:58vh;overflow-y:auto;touch-action:pan-y;box-sizing:border-box;padding:24px;background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:22px;box-shadow:0 20px 50px rgba(0,0,0,.08);color:var(--text);opacity:0;visibility:hidden;transition:opacity .25s,transform .25s,visibility .25s;z-index:2}
+.nav{transition:opacity 1s ease .4s;position:fixed;left:0;right:0;bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:0 16px;z-index:3}
+.nav button{pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:78px;padding:12px 14px;background:var(--glass);backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%);border:1px solid var(--glass-line);border-radius:14px;color:var(--text);font-weight:500;font-size:.85rem;font-family:inherit;box-shadow:0 2px 10px var(--sh1);transition:transform .2s,box-shadow .2s,background .2s}
+.nav button span{font-size:1.2rem;display:flex}
+.nav button:hover,.nav button.on{transform:translateY(-3px);background:var(--glass-on);box-shadow:0 8px 20px var(--sh2)}
+.panel{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);width:min(660px,calc(100% - 32px));max-height:58vh;overflow-y:auto;touch-action:pan-y;box-sizing:border-box;padding:24px;background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:22px;box-shadow:0 20px 50px var(--sh3);color:var(--text);opacity:0;visibility:hidden;transition:opacity .25s,transform .25s,visibility .25s;z-index:2}
 .panel.on{opacity:1;visibility:visible;transform:translate(-50%,0)}
 .panel h2{margin:0 0 10px;font-size:1.4rem;letter-spacing:-.02em}
 .panel p{margin:0 0 10px;line-height:1.6;color:var(--sub)}
 .cards{display:grid;gap:12px}
-.card{padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.card{padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--chip)}
 .card h3{margin:0 0 4px;font-size:1rem}.card p{margin:0;font-size:.92rem}
 .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.tags i{font-style:normal;font-size:.82rem;padding:5px 11px;border:1px solid var(--line);border-radius:99px;background:#fff;color:var(--text)}
+.tags i{font-style:normal;font-size:.82rem;padding:5px 11px;border:1px solid var(--line);border-radius:99px;background:var(--chip);color:var(--text)}
 .panel a{color:var(--text);font-weight:600}
 .close{position:absolute;top:12px;right:14px;border:0;background:none;font-size:1.3rem;cursor:pointer;color:var(--sub)}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-hand" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2M15 20v2M9 2v2M9 20v2M2 15h2M2 9h2M20 15h2M20 9h2"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+<symbol id="i-linkedin" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></symbol>
+<symbol id="i-github" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></symbol>
+</defs></svg>
 <canvas id="c"></canvas>
-<div class="hero"><p>Hey, I’m Sameer Singh 👋</p><h1>Cyber Security</h1><div class="avatar" id="avatar"><svg viewBox="0 0 200 200" role="img" aria-label="Cyber security shield"><defs><linearGradient id="avbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd9e6"/><stop offset=".5" stop-color="#e4dcff"/><stop offset="1" stop-color="#cfe6ff"/></linearGradient><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b6cff"/><stop offset="1" stop-color="#2f9bff"/></linearGradient></defs><circle cx="100" cy="100" r="96" fill="url(#avbg)"/><g class="orbit"><circle cx="100" cy="100" r="88" fill="none" stroke="#8b7cf0" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/><circle cx="100" cy="12" r="4.5" fill="#ff7aa8"/><circle cx="176" cy="144" r="4.5" fill="#3aa0ff"/><circle cx="24" cy="144" r="4.5" fill="#8b6cff"/></g><g stroke="#8b7cf0" stroke-opacity=".55" stroke-width="2" fill="none" stroke-linecap="round"><path d="M44 76H28L20 68"/><path d="M44 104H24"/><path d="M156 112H174L182 120"/><path d="M156 84H176"/></g><g fill="#8b7cf0" fill-opacity=".7"><circle cx="20" cy="68" r="3"/><circle cx="24" cy="104" r="3"/><circle cx="182" cy="120" r="3"/><circle cx="176" cy="84" r="3"/></g><g class="shield"><path d="M100 28L156 48V100C156 138 130 162 100 176C70 162 44 138 44 100V48Z" fill="url(#sg)"/><path d="M100 40L146 56V100C146 132 124 152 100 164C76 152 54 132 54 100V56Z" fill="#fff" fill-opacity=".16"/><path d="M84 96V86a16 16 0 0 1 32 0V96" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><rect x="76" y="94" width="48" height="40" rx="9" fill="#fff"/><circle cx="100" cy="110" r="6" fill="#5b6cff"/><rect x="97.5" y="112" width="5" height="13" rx="2.5" fill="#5b6cff"/></g></svg></div></div>
-<nav class="nav"><button data-p="me"><span>🙋</span>About Me</button><button data-p="projects"><span>🛡️</span>Projects</button><button data-p="skills"><span>🧠</span>Skills</button><button data-p="contact"><span>✉️</span>Contact</button></nav>
-<section class="panel" id="me"><button class="close" aria-label="Close">×</button><h2>About Me</h2><p>Hi, main Sameer Singh hoon, ek Cyber Security enthusiast. Mujhe systems ko tod kar samajhna aur phir unhe secure banana pasand hai.</p><p>Yahan apni asli story likho: padhai, experience, certifications (jaise CEH, CompTIA Security+) aur tumhe kya motivate karta hai.</p></section>
-<section class="panel" id="projects"><button class="close" aria-label="Close">×</button><h2>Projects</h2><div class="cards"><div class="card"><h3>Network Vulnerability Scanner</h3><p>Open ports aur weak services detect karne wala Python tool.</p></div><div class="card"><h3>Phishing Awareness Simulator</h3><p>Team training ke liye safe phishing campaign simulation.</p></div><div class="card"><h3>Password Strength Auditor</h3><p>Weak aur leaked passwords check karne wala audit tool.</p></div></div><p style="margin-top:12px;font-size:.85rem">(Ye sample projects hain, apne asli projects se replace kar lena.)</p></section>
+<button id="theme" role="switch" aria-checked="true" aria-label="Dark theme" title="Switch theme"><svg class="ti sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="#f7b23b"/><g stroke="#f7b23b" stroke-width="1.8" stroke-linecap="round"><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M5.1 5.1l1.7 1.7M17.2 17.2l1.7 1.7M5.1 18.9l1.7-1.7M17.2 6.8l1.7-1.7"/></g></svg><svg class="ti moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3.2a7.2 7.2 0 1 0 9.8 9.8 8.4 8.4 0 0 1-9.8-9.8z" fill="#f7b23b"/><path d="M18.2 3.4l.7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z" fill="#f7b23b"/></svg><span class="knob"></span></button>
+<div id="greet" aria-hidden="true"></div>
+<div class="hero"><p>Hey, I’m Sameer Singh <svg class="ic" aria-hidden="true"><use href="#i-hand"/></svg></p><h1>Cyber Security</h1><div class="avatar" id="avatar"><svg viewBox="0 0 200 200" role="img" aria-label="Cyber security shield"><defs><linearGradient id="avbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd9e6"/><stop offset=".5" stop-color="#e4dcff"/><stop offset="1" stop-color="#cfe6ff"/></linearGradient><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b6cff"/><stop offset="1" stop-color="#2f9bff"/></linearGradient></defs><circle cx="100" cy="100" r="96" fill="url(#avbg)"/><g class="orbit"><circle cx="100" cy="100" r="88" fill="none" stroke="#8b7cf0" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/><circle cx="100" cy="12" r="4.5" fill="#ff7aa8"/><circle cx="176" cy="144" r="4.5" fill="#3aa0ff"/><circle cx="24" cy="144" r="4.5" fill="#8b6cff"/></g><g stroke="#8b7cf0" stroke-opacity=".55" stroke-width="2" fill="none" stroke-linecap="round"><path d="M44 76H28L20 68"/><path d="M44 104H24"/><path d="M156 112H174L182 120"/><path d="M156 84H176"/></g><g fill="#8b7cf0" fill-opacity=".7"><circle cx="20" cy="68" r="3"/><circle cx="24" cy="104" r="3"/><circle cx="182" cy="120" r="3"/><circle cx="176" cy="84" r="3"/></g><g class="shield"><path d="M100 28L156 48V100C156 138 130 162 100 176C70 162 44 138 44 100V48Z" fill="url(#sg)"/><path d="M100 40L146 56V100C146 132 124 152 100 164C76 152 54 132 54 100V56Z" fill="#fff" fill-opacity=".16"/><path d="M84 96V86a16 16 0 0 1 32 0V96" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><rect x="76" y="94" width="48" height="40" rx="9" fill="#fff"/><circle cx="100" cy="110" r="6" fill="#5b6cff"/><rect x="97.5" y="112" width="5" height="13" rx="2.5" fill="#5b6cff"/></g></svg></div></div>
+<nav class="nav"><button data-p="me"><span><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span>About Me</button><button data-p="projects"><span><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span>Projects</button><button data-p="skills"><span><svg class="ic" aria-hidden="true"><use href="#i-cpu"/></svg></span>Skills</button><button data-p="contact"><span><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg></span>Contact</button></nav>
+<section class="panel" id="me"><button class="close" aria-label="Close">×</button><h2>About Me</h2><p>I’m a B.Tech Cyber Security student at Poornima University (graduating Apr 2027), based in Jaipur. I work across security operations, data analytics and web development, building intrusion detection tools, Power BI dashboards and Flask/React services with real authentication.</p><p>Currently a Data Analyst at InAmigos Foundation, and open to Data Analyst, SOC Analyst or Web Developer roles.</p></section>
+<section class="panel" id="projects"><button class="close" aria-label="Close">×</button><h2>Projects</h2><div class="cards"><div class="card"><h3><a href="https://github.com/Sameer-2904/IDS" target="_blank" rel="noopener">Network Intrusion Detection System</a></h3><p>Real-time monitor that detects port scans, brute-force logins and DoS patterns, with a Flask alert dashboard.</p></div><div class="card"><h3><a href="https://github.com/Sameer-2904/Secure-Authentication-System-With-MFA" target="_blank" rel="noopener">Secure Authentication System with MFA</a></h3><p>Flask auth service with JWT, TOTP-based MFA, secure password hashing and session management.</p></div><div class="card"><h3><a href="https://github.com/Sameer-2904/Smart-City-Mobility-Intelligence-Platform" target="_blank" rel="noopener">Smart City Mobility Intelligence Platform</a></h3><p>Power BI dashboard combining 5 datasets for traffic, transit, weather, emissions and parking insights.</p></div><div class="card"><h3><a href="https://sameer-2904.github.io/Dine-Luxe/" target="_blank" rel="noopener">Dine-Luxe</a></h3><p>Full-stack restaurant discovery platform with a React frontend and Flask backend.</p></div></div></section>
 <section class="panel" id="skills"><button class="close" aria-label="Close">×</button><h2>Skills</h2><div class="tags"><i>Network Security</i><i>Penetration Testing</i><i>Ethical Hacking</i><i>Linux</i><i>Wireshark</i><i>Nmap</i><i>Burp Suite</i><i>Python</i><i>OWASP Top 10</i><i>Incident Response</i></div></section>
-<section class="panel" id="contact"><button class="close" aria-label="Close">×</button><h2>Contact</h2><p>Baat karni ho ya kaam ke liye, yahan reach karo:</p><p>📧 <a href="mailto:sameer@example.com">sameer@example.com</a></p><p>💼 <a href="#">LinkedIn</a> · 🐙 <a href="#">GitHub</a></p></section>
+<section class="panel" id="contact"><button class="close" aria-label="Close">×</button><h2>Contact</h2><p>If you want to talk to me or want to work with me then, reach karo:</p><p><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg> <a href="mailto:sameersinghtanwar3@gmail.com">sameersinghtanwar3@gmail.com</a></p><p><svg class="ic" aria-hidden="true"><use href="#i-linkedin"/></svg> <a href="https://www.linkedin.com/in/sameer-singh-230170406/">LinkedIn</a> · <svg class="ic" aria-hidden="true"><use href="#i-github"/></svg> <a href="https://github.com/sameer-2904">GitHub</a></p></section>
 <script>
 const c=document.getElementById('c'),gl=c.getContext('webgl2',{alpha:false});
-if(!gl||!gl.getExtension('EXT_color_buffer_float')){document.querySelector('.hero p:last-child').textContent='WebGL2 supported nahi hai is browser mein';throw 0}
-const dark=()=>false;
+if(!gl||!gl.getExtension('EXT_color_buffer_float')){document.querySelector('.hero p').textContent='WebGL2 supported nahi hai is browser mein';throw 0}
+const dark=()=>document.documentElement.dataset.theme==="dark";
 const VS=`#version 300 es
 out vec2 v;void main(){v=vec2(gl_VertexID&1,gl_VertexID>>1);gl_Position=vec4(v*2.-1.,0,1);}`;
 const H='#version 300 es\nprecision highp float;in vec2 v;out vec4 o;';
@@ -105,7 +135,7 @@ function frame(now){const dt=Math.min((now-last)/1000,.0167)*.6;last=now;
  run('grad',{uP:pr.r,uV:vel.r,t:vt},vel.w);vel.swap();
  run('adv',{uV:vel.r,uS:vel.r,t:vt,dt,d:.8},vel.w);vel.swap();
  run('adv',{uV:vel.r,uS:dye.r,t:vt,dt,d:1.6},dye.w);dye.swap();
- run('show',{uS:dye.r,bg:dark()?[.043,.043,.06]:[1,1,1]});
+ run('show',{uS:dye.r,bg:dark()?[0,0,0]:[1,1,1]});
  requestAnimationFrame(frame)}
 requestAnimationFrame(frame);
 const btns=[...document.querySelectorAll('.nav button')],pans=[...document.querySelectorAll('.panel')];
@@ -113,6 +143,14 @@ function openP(id){pans.forEach(p=>p.classList.toggle('on',p.id===id));btns.forE
 btns.forEach(b=>b.addEventListener('click',()=>openP(b.classList.contains('on')?'':b.dataset.p)));
 document.querySelectorAll('.close').forEach(x=>x.addEventListener('click',()=>openP('')));
 addEventListener('keydown',e=>{if(e.key==='Escape')openP('')});
+const G=['Hello','नमस्ते','Hola','Bonjour','こんにちは','你好','안녕하세요','Ciao','مرحبا','Привет','Olá','வணக்கம்'],gr=document.getElementById('greet');let gi=0;
+function nextG(){if(gi>=G.length){gr.classList.add('out');document.body.classList.add('ready');return}
+ gr.textContent=G[gi++];gr.classList.remove('in');void gr.offsetWidth;gr.classList.add('in');setTimeout(nextG,380)}
+nextG();
+const tb=document.getElementById('theme');
+function paintT(){tb.setAttribute('aria-checked',dark())}
+paintT();
+tb.addEventListener('click',()=>{const n=dark()?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem('theme',n)}catch(e){}paintT()});
 </script>
 </body>
 </html>
