@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fluid Cursor</title>
+<style>
+:root{--bg:#fff;--text:#111;--sub:#666;--card:rgba(255,255,255,.93);--line:#e6e6e6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;touch-action:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.hero{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;color:var(--text)}
+.hero p{margin:0;color:var(--sub);font-size:clamp(1rem,2.4vw,1.25rem)}
+.hero h1{margin:.15em 0;font-size:clamp(2.4rem,8vw,5rem);letter-spacing:-.03em}
+.avatar{width:clamp(110px,min(22vw,24vh),190px);margin-top:14px;animation:bob 4.5s ease-in-out infinite;filter:drop-shadow(0 12px 24px rgba(120,100,200,.18))}
+.avatar svg{display:block;width:100%;height:auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes glow{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.orbit{transform-origin:100px 100px;animation:spin 16s linear infinite}
+.shield{transform-origin:100px 100px;animation:glow 3.5s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion: reduce){.avatar,.orbit,.shield{animation:none}}
+.nav{position:fixed;left:0;right:0;bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:0 16px;z-index:3}
+.nav button{pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:78px;padding:12px 14px;background:rgba(255,255,255,.22);backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%);border:1px solid rgba(0,0,0,.08);border-radius:14px;color:var(--text);font-weight:500;font-size:.85rem;font-family:inherit;box-shadow:0 2px 10px rgba(0,0,0,.04);transition:transform .2s,box-shadow .2s}
+.nav button span{font-size:1.2rem}
+.nav button:hover,.nav button.on{transform:translateY(-3px);background:rgba(255,255,255,.4);box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.panel{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);width:min(660px,calc(100% - 32px));max-height:58vh;overflow-y:auto;touch-action:pan-y;box-sizing:border-box;padding:24px;background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:22px;box-shadow:0 20px 50px rgba(0,0,0,.08);color:var(--text);opacity:0;visibility:hidden;transition:opacity .25s,transform .25s,visibility .25s;z-index:2}
+.panel.on{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.panel h2{margin:0 0 10px;font-size:1.4rem;letter-spacing:-.02em}
+.panel p{margin:0 0 10px;line-height:1.6;color:var(--sub)}
+.cards{display:grid;gap:12px}
+.card{padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.card h3{margin:0 0 4px;font-size:1rem}.card p{margin:0;font-size:.92rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.tags i{font-style:normal;font-size:.82rem;padding:5px 11px;border:1px solid var(--line);border-radius:99px;background:#fff;color:var(--text)}
+.panel a{color:var(--text);font-weight:600}
+.close{position:absolute;top:12px;right:14px;border:0;background:none;font-size:1.3rem;cursor:pointer;color:var(--sub)}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="hero"><p>Hey, I’m Sameer Singh 👋</p><h1>Cyber Security</h1><div class="avatar" id="avatar"><svg viewBox="0 0 200 200" role="img" aria-label="Cyber security shield"><defs><linearGradient id="avbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd9e6"/><stop offset=".5" stop-color="#e4dcff"/><stop offset="1" stop-color="#cfe6ff"/></linearGradient><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b6cff"/><stop offset="1" stop-color="#2f9bff"/></linearGradient></defs><circle cx="100" cy="100" r="96" fill="url(#avbg)"/><g class="orbit"><circle cx="100" cy="100" r="88" fill="none" stroke="#8b7cf0" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/><circle cx="100" cy="12" r="4.5" fill="#ff7aa8"/><circle cx="176" cy="144" r="4.5" fill="#3aa0ff"/><circle cx="24" cy="144" r="4.5" fill="#8b6cff"/></g><g stroke="#8b7cf0" stroke-opacity=".55" stroke-width="2" fill="none" stroke-linecap="round"><path d="M44 76H28L20 68"/><path d="M44 104H24"/><path d="M156 112H174L182 120"/><path d="M156 84H176"/></g><g fill="#8b7cf0" fill-opacity=".7"><circle cx="20" cy="68" r="3"/><circle cx="24" cy="104" r="3"/><circle cx="182" cy="120" r="3"/><circle cx="176" cy="84" r="3"/></g><g class="shield"><path d="M100 28L156 48V100C156 138 130 162 100 176C70 162 44 138 44 100V48Z" fill="url(#sg)"/><path d="M100 40L146 56V100C146 132 124 152 100 164C76 152 54 132 54 100V56Z" fill="#fff" fill-opacity=".16"/><path d="M84 96V86a16 16 0 0 1 32 0V96" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><rect x="76" y="94" width="48" height="40" rx="9" fill="#fff"/><circle cx="100" cy="110" r="6" fill="#5b6cff"/><rect x="97.5" y="112" width="5" height="13" rx="2.5" fill="#5b6cff"/></g></svg></div></div>
+<nav class="nav"><button data-p="me"><span>🙋</span>About Me</button><button data-p="projects"><span>🛡️</span>Projects</button><button data-p="skills"><span>🧠</span>Skills</button><button data-p="contact"><span>✉️</span>Contact</button></nav>
+<section class="panel" id="me"><button class="close" aria-label="Close">×</button><h2>About Me</h2><p>Hi, main Sameer Singh hoon, ek Cyber Security enthusiast. Mujhe systems ko tod kar samajhna aur phir unhe secure banana pasand hai.</p><p>Yahan apni asli story likho: padhai, experience, certifications (jaise CEH, CompTIA Security+) aur tumhe kya motivate karta hai.</p></section>
+<section class="panel" id="projects"><button class="close" aria-label="Close">×</button><h2>Projects</h2><div class="cards"><div class="card"><h3>Network Vulnerability Scanner</h3><p>Open ports aur weak services detect karne wala Python tool.</p></div><div class="card"><h3>Phishing Awareness Simulator</h3><p>Team training ke liye safe phishing campaign simulation.</p></div><div class="card"><h3>Password Strength Auditor</h3><p>Weak aur leaked passwords check karne wala audit tool.</p></div></div><p style="margin-top:12px;font-size:.85rem">(Ye sample projects hain, apne asli projects se replace kar lena.)</p></section>
+<section class="panel" id="skills"><button class="close" aria-label="Close">×</button><h2>Skills</h2><div class="tags"><i>Network Security</i><i>Penetration Testing</i><i>Ethical Hacking</i><i>Linux</i><i>Wireshark</i><i>Nmap</i><i>Burp Suite</i><i>Python</i><i>OWASP Top 10</i><i>Incident Response</i></div></section>
+<section class="panel" id="contact"><button class="close" aria-label="Close">×</button><h2>Contact</h2><p>Baat karni ho ya kaam ke liye, yahan reach karo:</p><p>📧 <a href="mailto:sameer@example.com">sameer@example.com</a></p><p>💼 <a href="#">LinkedIn</a> · 🐙 <a href="#">GitHub</a></p></section>
+<script>
+const c=document.getElementById('c'),gl=c.getContext('webgl2',{alpha:false});
+if(!gl||!gl.getExtension('EXT_color_buffer_float')){document.querySelector('.hero p:last-child').textContent='WebGL2 supported nahi hai is browser mein';throw 0}
+const dark=()=>false;
+const VS=`#version 300 es
+out vec2 v;void main(){v=vec2(gl_VertexID&1,gl_VertexID>>1);gl_Position=vec4(v*2.-1.,0,1);}`;
+const H='#version 300 es\nprecision highp float;in vec2 v;out vec4 o;';
+const S={
+splat:'uniform sampler2D uS;uniform vec3 col;uniform vec2 pt;uniform float r,ar;void main(){vec2 p=v-pt;p.x*=ar;o=texture(uS,v)+vec4(col*exp(-dot(p,p)/r),1.);}',
+adv:'uniform sampler2D uV,uS;uniform vec2 t;uniform float dt,d;void main(){o=texture(uS,v-dt*texture(uV,v).xy*t)/(1.+d*dt);}',
+curl:'uniform sampler2D uV;uniform vec2 t;void main(){float L=texture(uV,v-vec2(t.x,0)).y,R=texture(uV,v+vec2(t.x,0)).y,T=texture(uV,v+vec2(0,t.y)).x,B=texture(uV,v-vec2(0,t.y)).x;o=vec4(.5*(R-L-T+B),0,0,1);}',
+vort:'uniform sampler2D uV,uC;uniform vec2 t;uniform float curl,dt;void main(){float L=texture(uC,v-vec2(t.x,0)).x,R=texture(uC,v+vec2(t.x,0)).x,T=texture(uC,v+vec2(0,t.y)).x,B=texture(uC,v-vec2(0,t.y)).x,C=texture(uC,v).x;vec2 f=.5*vec2(abs(T)-abs(B),abs(R)-abs(L));f/=length(f)+1e-4;f*=curl*C;f.y*=-1.;o=vec4(clamp(texture(uV,v).xy+f*dt,-1000.,1000.),0,1);}',
+div:'uniform sampler2D uV;uniform vec2 t;void main(){float L=texture(uV,v-vec2(t.x,0)).x,R=texture(uV,v+vec2(t.x,0)).x,T=texture(uV,v+vec2(0,t.y)).y,B=texture(uV,v-vec2(0,t.y)).y;vec2 C=texture(uV,v).xy;if(v.x-t.x<0.)L=-C.x;if(v.x+t.x>1.)R=-C.x;if(v.y+t.y>1.)T=-C.y;if(v.y-t.y<0.)B=-C.y;o=vec4(.5*(R-L+T-B),0,0,1);}',
+clr:'uniform sampler2D uP;uniform float val;void main(){o=val*texture(uP,v);}',
+jac:'uniform sampler2D uP,uD;uniform vec2 t;void main(){float L=texture(uP,v-vec2(t.x,0)).x,R=texture(uP,v+vec2(t.x,0)).x,T=texture(uP,v+vec2(0,t.y)).x,B=texture(uP,v-vec2(0,t.y)).x;o=vec4((L+R+B+T-texture(uD,v).x)*.25,0,0,1);}',
+grad:'uniform sampler2D uP,uV;uniform vec2 t;void main(){float L=texture(uP,v-vec2(t.x,0)).x,R=texture(uP,v+vec2(t.x,0)).x,T=texture(uP,v+vec2(0,t.y)).x,B=texture(uP,v-vec2(0,t.y)).x;o=vec4(texture(uV,v).xy-vec2(R-L,T-B),0,1);}',
+show:'uniform sampler2D uS;uniform vec3 bg;void main(){vec3 c=texture(uS,v).rgb;float m=max(c.r,max(c.g,c.b));float a=1.-exp(-1.3*m);o=vec4(mix(bg,c/max(m,1e-4),a),1.);}'
+};
+const P={};
+function sh(t,s){const x=gl.createShader(t);gl.shaderSource(x,s);gl.compileShader(x);return x}
+for(const k in S){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,VS));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,H+S[k]));gl.linkProgram(p);P[k]=p}
+let cw,ch;
+function run(n,u,t){const p=P[n];gl.useProgram(p);let k=0;
+ for(const key in u){const val=u[key],l=gl.getUniformLocation(p,key);
+  if(val&&val.tex){gl.activeTexture(gl.TEXTURE0+k);gl.bindTexture(gl.TEXTURE_2D,val.tex);gl.uniform1i(l,k++)}
+  else if(typeof val==='number')gl.uniform1f(l,val);
+  else if(val.length===2)gl.uniform2fv(l,val);else gl.uniform3fv(l,val)}
+ gl.bindFramebuffer(gl.FRAMEBUFFER,t?t.fbo:null);gl.viewport(0,0,t?t.w:cw,t?t.h:ch);gl.drawArrays(gl.TRIANGLE_STRIP,0,4)}
+function fbo(w,h){const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA16F,w,h,0,gl.RGBA,gl.HALF_FLOAT,null);
+ const f=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,f);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tex,0);
+ gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT);return{tex,fbo:f,w,h}}
+function dbl(w,h){const d={r:fbo(w,h),w:fbo(w,h),swap(){[d.r,d.w]=[d.w,d.r]}};return d}
+let vel,dye,pr,cur,dv,vt,dt_;
+function res(a,s){return a>1?[Math.round(s*a),s]:[s,Math.round(s/a)]}
+function init(){const d=Math.min(devicePixelRatio||1,1.5);cw=c.width=Math.round(innerWidth*d);ch=c.height=Math.round(innerHeight*d);
+ const a=cw/ch,[sw,sh_]=res(a,128),[dw,dh]=res(a,768);
+ vel=dbl(sw,sh_);pr=dbl(sw,sh_);cur=fbo(sw,sh_);dv=fbo(sw,sh_);dye=dbl(dw,dh);vt=[1/sw,1/sh_]}
+init();addEventListener('resize',init);
+function hsv(h){const i=Math.floor(h*6),f=h*6-i,q=1-f;return[[1,f,0],[q,1,0],[0,1,f],[0,q,1],[f,0,1],[1,0,q]][i%6]}
+function splat(x,y,dx,dy,col){const a=cw/ch,r=a>1?.006*a:.006;
+ run('splat',{uS:vel.r,col:[dx*1800,dy*1800,0],pt:[x,y],r,ar:a},vel.w);vel.swap();
+ run('splat',{uS:dye.r,col:col.map(v=>v*.09),pt:[x,y],r,ar:a},dye.w);dye.swap()}
+let lx=null,ly=0,hue=Math.random();
+function move(px,py){const x=px/innerWidth,y=1-py/innerHeight;
+ if(lx!==null){const dx=x-lx,dy=y-ly;if(dx||dy){hue=(hue+.004)%1;splat(x,y,dx,dy,hsv(hue))}}lx=x;ly=y}
+addEventListener('pointermove',e=>{demo=false;move(e.clientX,e.clientY)});
+addEventListener('pointerleave',()=>lx=null);
+let demo=true,t0=performance.now(),last=t0;
+function frame(now){const dt=Math.min((now-last)/1000,.0167)*.6;last=now;
+ if(demo){const s=(now-t0)/1000;if(s>3.5)demo=false;else move(innerWidth*(.5+.38*Math.sin(s*1.8)),innerHeight*(.5+.22*Math.sin(s*2.7+1)))}
+ run('curl',{uV:vel.r,t:vt},cur);
+ run('vort',{uV:vel.r,uC:cur,t:vt,curl:4,dt},vel.w);vel.swap();
+ run('div',{uV:vel.r,t:vt},dv);
+ run('clr',{uP:pr.r,val:.8},pr.w);pr.swap();
+ for(let i=0;i<20;i++){run('jac',{uP:pr.r,uD:dv,t:vt},pr.w);pr.swap()}
+ run('grad',{uP:pr.r,uV:vel.r,t:vt},vel.w);vel.swap();
+ run('adv',{uV:vel.r,uS:vel.r,t:vt,dt,d:.8},vel.w);vel.swap();
+ run('adv',{uV:vel.r,uS:dye.r,t:vt,dt,d:1.6},dye.w);dye.swap();
+ run('show',{uS:dye.r,bg:dark()?[.043,.043,.06]:[1,1,1]});
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+const btns=[...document.querySelectorAll('.nav button')],pans=[...document.querySelectorAll('.panel')];
+function openP(id){pans.forEach(p=>p.classList.toggle('on',p.id===id));btns.forEach(b=>b.classList.toggle('on',b.dataset.p===id))}
+btns.forEach(b=>b.addEventListener('click',()=>openP(b.classList.contains('on')?'':b.dataset.p)));
+document.querySelectorAll('.close').forEach(x=>x.addEventListener('click',()=>openP('')));
+addEventListener('keydown',e=>{if(e.key==='Escape')openP('')});
+</script>
+</body>
+</html>
