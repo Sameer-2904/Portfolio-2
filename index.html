@@ -13,7 +13,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 .hero{transition:opacity 1s ease .2s;position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;color:var(--text)}
 .hero p{margin:0;color:var(--sub);font-size:clamp(1rem,2.4vw,1.25rem)}
 .hero h1{margin:.15em 0;font-size:clamp(2.4rem,8vw,5rem);letter-spacing:-.03em}
-.avatar{width:clamp(110px,min(22vw,24vh),190px);margin-top:14px;animation:bob 4.5s ease-in-out infinite;filter:drop-shadow(0 12px 24px rgba(76,201,240,.28))}
+.avatar{width:clamp(110px,min(22vw,24vh),190px);margin-top:14px;animation:bob 4.5s ease-in-out infinite;}
 .avatar svg{display:block;width:100%;height:auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes glow{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
@@ -39,13 +39,9 @@ body:not(.ready) .hero,body:not(.ready) .nav{opacity:0;pointer-events:none}
 .panel p .ic{margin-right:.35em}
 .eye{transform-box:fill-box;transform-origin:center;animation:blink 5s infinite}
 @keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
-.pupil{transition:transform .12s ease-out}
 .orbit2{transform-origin:100px 100px;animation:spin 22s linear infinite reverse}
 .bar{transform-box:fill-box;transform-origin:50% 100%;animation:bar 1.1s ease-in-out infinite}
 @keyframes bar{0%,100%{transform:scaleY(.4);opacity:.65}50%{transform:scaleY(1);opacity:1}}
-.pupil{filter:drop-shadow(0 0 3px #4cc9f0) drop-shadow(0 0 7px rgba(76,201,240,.6))}
-.glow{filter:drop-shadow(0 0 8px rgba(76,201,240,.55))}
-#sent{transition:transform .08s ease-out}
 @media (prefers-reduced-motion: reduce){.avatar,.orbit,.orbit2,.shield,.eye,.bar{animation:none}}
 .nav{transition:opacity 1s ease .4s;position:fixed;left:0;right:0;bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:0 16px;z-index:3}
 .nav button{pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:78px;padding:12px 14px;background:var(--glass);backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%);border:1px solid var(--glass-line);border-radius:14px;color:var(--text);font-weight:500;font-size:.85rem;font-family:inherit;box-shadow:0 2px 10px var(--sh1);transition:transform .2s,box-shadow .2s,background .2s}
@@ -62,6 +58,16 @@ body:not(.ready) .hero,body:not(.ready) .nav{opacity:0;pointer-events:none}
 .tags i{font-style:normal;font-size:.82rem;padding:5px 11px;border:1px solid var(--line);border-radius:99px;background:var(--chip);color:var(--text)}
 .panel a{color:var(--text);font-weight:600}
 .close{position:absolute;top:12px;right:14px;border:0;background:none;font-size:1.3rem;cursor:pointer;color:var(--sub)}
+.nav button{white-space:nowrap}
+@media (max-width:560px){
+.hero{padding-bottom:110px;box-sizing:border-box}
+.nav{flex-wrap:nowrap;gap:8px;padding:0 12px;bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.nav button{flex:1 1 0;min-width:0;padding:10px 4px;gap:4px;font-size:.72rem;border-radius:12px}
+.nav button span{font-size:1.05rem}
+.nav button:hover,.nav button.on{transform:translateY(-2px)}
+.panel{bottom:calc(92px + env(safe-area-inset-bottom,0px));width:calc(100% - 24px);max-height:min(46vh,calc(100dvh - 240px));padding:20px 18px;border-radius:20px}
+.panel h2{font-size:1.25rem}
+}
 </style>
 </head>
 <body>
@@ -78,7 +84,7 @@ body:not(.ready) .hero,body:not(.ready) .nav{opacity:0;pointer-events:none}
 <canvas id="c"></canvas>
 <button id="theme" role="switch" aria-checked="true" aria-label="Dark theme" title="Switch theme"><svg class="ti sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="#f7b23b"/><g stroke="#f7b23b" stroke-width="1.8" stroke-linecap="round"><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M5.1 5.1l1.7 1.7M17.2 17.2l1.7 1.7M5.1 18.9l1.7-1.7M17.2 6.8l1.7-1.7"/></g></svg><svg class="ti moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3.2a7.2 7.2 0 1 0 9.8 9.8 8.4 8.4 0 0 1-9.8-9.8z" fill="#f7b23b"/><path d="M18.2 3.4l.7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z" fill="#f7b23b"/></svg><span class="knob"></span></button>
 <div id="greet" aria-hidden="true"></div>
-<div class="hero"><p>Hey, I’m Sameer Singh <svg class="ic" aria-hidden="true"><use href="#i-hand"/></svg></p><h1>Cyber Security</h1><div class="avatar" id="avatar"><svg viewBox="0 0 200 200" role="img" aria-label="Cyber sentinel robot whose glowing eyes follow your cursor"><defs><radialGradient id="disc" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#1b2a4a"/><stop offset=".7" stop-color="#0d1526"/></radialGradient><radialGradient id="lens" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#0f1729"/><stop offset=".75" stop-color="#060a14"/></radialGradient><radialGradient id="pup"><stop offset="0" stop-color="#bff3ff"/><stop offset=".55" stop-color="#4cc9f0"/><stop offset="1" stop-color="#0b4e66"/></radialGradient><linearGradient id="cy" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#4cc9f0"/><stop offset="1" stop-color="#bff3ff"/></linearGradient><clipPath id="lc1"><circle cx="76" cy="84" r="23"/></clipPath><clipPath id="lc2"><circle cx="124" cy="84" r="23"/></clipPath></defs><circle class="orbit" cx="100" cy="100" r="94" fill="none" stroke="#4cc9f0" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="4 6" stroke-linecap="round"/><circle class="orbit2" cx="100" cy="100" r="84" fill="none" stroke="#9d7bff" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="3 7" stroke-linecap="round"/><g id="sent"><circle cx="100" cy="100" r="70" fill="url(#disc)" stroke="#4cc9f0" stroke-opacity=".6" stroke-width="2" class="glow"/><circle cx="100" cy="100" r="76" fill="none" stroke="#4cc9f0" stroke-opacity=".08" stroke-width="6"/><circle class="eyew" cx="76" cy="84" r="24" fill="url(#lens)" stroke="#4cc9f0" stroke-opacity=".45"/><circle class="eyew" cx="124" cy="84" r="24" fill="url(#lens)" stroke="#4cc9f0" stroke-opacity=".45"/><g clip-path="url(#lc1)"><circle class="pupil" cx="76" cy="84" r="8.5" fill="url(#pup)"/></g><g clip-path="url(#lc2)"><circle class="pupil" cx="124" cy="84" r="8.5" fill="url(#pup)"/></g><rect class="bar" style="animation-delay:0.00s" x="69.5" y="136" width="6" height="10" rx="3" fill="url(#cy)"/><rect class="bar" style="animation-delay:0.12s" x="80.5" y="125" width="6" height="21" rx="3" fill="url(#cy)"/><rect class="bar" style="animation-delay:0.24s" x="91.5" y="132" width="6" height="14" rx="3" fill="url(#cy)"/><rect class="bar" style="animation-delay:0.36s" x="102.5" y="121" width="6" height="25" rx="3" fill="url(#cy)"/><rect class="bar" style="animation-delay:0.48s" x="113.5" y="130.5" width="6" height="15.5" rx="3" fill="url(#cy)"/><rect class="bar" style="animation-delay:0.60s" x="124.5" y="137" width="6" height="9" rx="3" fill="url(#cy)"/></g></svg></div></div>
+<div class="hero"><p>Hey, I’m Sameer Singh <svg class="ic" aria-hidden="true"><use href="#i-hand"/></svg></p><h1>Cyber Security</h1><div class="avatar" id="avatar"><svg viewBox="0 0 200 200" role="img" aria-label="Cyber sentinel robot whose glowing eyes follow your cursor"><defs><radialGradient id="disc" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#1b2a4a"/><stop offset=".7" stop-color="#0d1526"/></radialGradient><radialGradient id="lens" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#0f1729"/><stop offset=".75" stop-color="#060a14"/></radialGradient><radialGradient id="halo"><stop offset="0" stop-color="#4cc9f0" stop-opacity=".55"/><stop offset="1" stop-color="#4cc9f0" stop-opacity="0"/></radialGradient><radialGradient id="pup"><stop offset="0" stop-color="#bff3ff"/><stop offset=".55" stop-color="#4cc9f0"/><stop offset="1" stop-color="#0b4e66"/></radialGradient><linearGradient id="cy" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#4cc9f0"/><stop offset="1" stop-color="#bff3ff"/></linearGradient><clipPath id="lc1"><circle cx="76" cy="84" r="23"/></clipPath><clipPath id="lc2"><circle cx="124" cy="84" r="23"/></clipPath></defs><circle class="orbit" cx="100" cy="100" r="94" fill="none" stroke="#4cc9f0" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="4 6" stroke-linecap="round"/><circle class="orbit2" cx="100" cy="100" r="84" fill="none" stroke="#9d7bff" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="3 7" stroke-linecap="round"/><g id="sent"><circle cx="100" cy="100" r="70" fill="url(#disc)" stroke="#4cc9f0" stroke-opacity=".6" stroke-width="2"/><circle cx="100" cy="100" r="76" fill="none" stroke="#4cc9f0" stroke-opacity=".08" stroke-width="6"/><circle cx="100" cy="100" r="82" fill="none" stroke="#4cc9f0" stroke-opacity=".05" stroke-width="8"/><circle class="eyew" cx="76" cy="84" r="24" fill="url(#lens)" stroke="#4cc9f0" stroke-opacity=".45"/><circle class="eyew" cx="124" cy="84" r="24" fill="url(#lens)" stroke="#4cc9f0" stroke-opacity=".45"/><g clip-path="url(#lc1)"><g class="pupil"><circle cx="76" cy="84" r="15" fill="url(#halo)"/><circle cx="76" cy="84" r="8.5" fill="url(#pup)"/></g></g><g clip-path="url(#lc2)"><g class="pupil"><circle cx="124" cy="84" r="15" fill="url(#halo)"/><circle cx="124" cy="84" r="8.5" fill="url(#pup)"/></g></g><rect class="bar" style="animation-delay:0.00s" x="69.5" y="136" width="6" height="10" rx="3" fill="url(#cy)"/><rect class="bar" style="animation-delay:0.12s" x="80.5" y="125" width="6" height="21" rx="3" fill="url(#cy)"/><rect class="bar" style="animation-delay:0.24s" x="91.5" y="132" width="6" height="14" rx="3" fill="url(#cy)"/><rect class="bar" style="animation-delay:0.36s" x="102.5" y="121" width="6" height="25" rx="3" fill="url(#cy)"/><rect class="bar" style="animation-delay:0.48s" x="113.5" y="130.5" width="6" height="15.5" rx="3" fill="url(#cy)"/><rect class="bar" style="animation-delay:0.60s" x="124.5" y="137" width="6" height="9" rx="3" fill="url(#cy)"/></g></svg></div></div>
 <nav class="nav"><button data-p="me"><span><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span>About Me</button><button data-p="projects"><span><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span>Projects</button><button data-p="skills"><span><svg class="ic" aria-hidden="true"><use href="#i-cpu"/></svg></span>Skills</button><button data-p="contact"><span><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg></span>Contact</button></nav>
 <section class="panel" id="me"><button class="close" aria-label="Close">×</button><h2>About Me</h2><p>I’m a B.Tech Cyber Security student at Poornima University (graduating Apr 2027), based in Jaipur. I work across security operations, data analytics and web development, building intrusion detection tools, Power BI dashboards and Flask/React services with real authentication.</p><p>Currently a Data Analyst at InAmigos Foundation, and open to Data Analyst, SOC Analyst or Web Developer roles.</p></section>
 <section class="panel" id="projects"><button class="close" aria-label="Close">×</button><h2>Projects</h2><div class="cards"><div class="card"><h3><a href="https://github.com/Sameer-2904/IDS" target="_blank" rel="noopener">Network Intrusion Detection System</a></h3><p>Real-time monitor that detects port scans, brute-force logins and DoS patterns, with a Flask alert dashboard.</p></div><div class="card"><h3><a href="https://github.com/Sameer-2904/Secure-Authentication-System-With-MFA" target="_blank" rel="noopener">Secure Authentication System with MFA</a></h3><p>Flask auth service with JWT, TOTP-based MFA, secure password hashing and session management.</p></div><div class="card"><h3><a href="https://github.com/Sameer-2904/Smart-City-Mobility-Intelligence-Platform" target="_blank" rel="noopener">Smart City Mobility Intelligence Platform</a></h3><p>Power BI dashboard combining 5 datasets for traffic, transit, weather, emissions and parking insights.</p></div><div class="card"><h3><a href="https://sameer-2904.github.io/Dine-Luxe/" target="_blank" rel="noopener">Dine-Luxe</a></h3><p>Full-stack restaurant discovery platform with a React frontend and Flask backend.</p></div></div></section>
@@ -162,9 +168,18 @@ function paintT(){tb.setAttribute('aria-checked',dark())}
 paintT();
 tb.addEventListener('click',()=>{const n=dark()?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem('theme',n)}catch(e){}paintT()});
 const eyeW=[...document.querySelectorAll('#avatar .eyew')],pupils=[...document.querySelectorAll('#avatar .pupil')],sent=document.getElementById('sent');
-function look(x,y){eyeW.forEach((e,i)=>{const r=e.getBoundingClientRect(),dx=x-(r.left+r.width/2),dy=y-(r.top+r.height/2),d=Math.hypot(dx,dy)||1,m=Math.min(1,d/160)*11;pupils[i].style.transform='translate('+dx/d*m+'px,'+dy/d*m+'px)'});
- sent.style.transform='translate('+((x/innerWidth*2-1)*4)+'px,'+((y/innerHeight*2-1)*4)+'px)'}
-addEventListener('pointermove',e=>look(e.clientX,e.clientY));
+let tx=innerWidth/2,ty=innerHeight/2,cen=[[0,0],[0,0]],fr=0;const E=[[0,0],[0,0]],D=[0,0];
+function measure(){cen=eyeW.map(e=>{const r=e.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]})}
+addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY},{passive:true});
+addEventListener('resize',measure);addEventListener('scroll',measure,{passive:true});
+function tick(){if(fr++%20===0)measure();
+ for(let i=0;i<2;i++){const dx=tx-cen[i][0],dy=ty-cen[i][1],d=Math.hypot(dx,dy)||1,m=Math.min(1,d/160)*11,e=E[i];
+  e[0]+=(dx/d*m-e[0])*.3;e[1]+=(dy/d*m-e[1])*.3;
+  pupils[i].style.transform='translate('+e[0].toFixed(2)+'px,'+e[1].toFixed(2)+'px)'}
+ D[0]+=((tx/innerWidth*2-1)*4-D[0])*.18;D[1]+=((ty/innerHeight*2-1)*4-D[1])*.18;
+ sent.style.transform='translate('+D[0].toFixed(2)+'px,'+D[1].toFixed(2)+'px)';
+ requestAnimationFrame(tick)}
+measure();requestAnimationFrame(tick);
 </script>
 </body>
 </html>
